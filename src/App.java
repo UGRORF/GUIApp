@@ -3,6 +3,9 @@ package src;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openqa.selenium.By;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -13,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class App extends Frame{
     Menu menu;
@@ -21,13 +25,16 @@ public class App extends Frame{
     ButtonGroup buttonGroup;
     JRadioButton radioButton1, radioButton2;
     JTextField t1, t2, t3, t4, t5;
-    private String path1, path2;
+    private final String path1, path2;
     GroupLayout layout;
     eHandler handler;
-
+    EdgeOptions options;
+    EdgeDriver driver;
 
     public App(){
         super();
+
+
 
         //Меню
         menu = new Menu(this);
@@ -36,7 +43,7 @@ public class App extends Frame{
         handler = new eHandler();
 
 
-        // Path to files
+        //Path to files
         path1 = "";
         path2 = "";
 
@@ -71,12 +78,12 @@ public class App extends Frame{
 
 
 
-        // Manager layout
+        // Определение менеджера расположения
         layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
-        // horizontal Group
+        // Создание горизонтальной группы
         layout.setHorizontalGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(l1)
@@ -111,7 +118,7 @@ public class App extends Frame{
 
         layout.linkSize(SwingConstants.HORIZONTAL, b1);
 
-        // Vertical Group
+        // Создание вертикальной группы
         layout.setVerticalGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(l1)
@@ -154,6 +161,7 @@ public class App extends Frame{
         b3.hide();
         l7.hide();
 
+        addListener();
 
     }
 
@@ -274,6 +282,31 @@ public class App extends Frame{
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileInputStream);
             Sheet sheet = xssfWorkbook.getSheetAt(0);
 
+            try {
+                options = new EdgeOptions();
+                options.addArguments("headless");
+                driver = new EdgeDriver();
+                String str = t2.getText();
+                str = str.replaceAll(" ", "* ");
+                System.out.println(str);
+                driver.get("http://alfa/search/Pages/view.aspx#/all?query=" + str);
+                driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+                driver.findElement(By.className("command_user_name_text_hover")).click();
+                String position = driver.findElement(By.xpath("/html/body/form/div[10]/div[1]/div/div[2]/div[2]/div[3]" +
+                        "/div[1]/div[2]/div[1]/div[1]/div/div/div/div/div[1]/app-root/div/app-user-info/div" +
+                        "/div[2]/div[2]/div/app-main-user-data/div/div[2]")).getText();
+                String department = driver.findElement(By.xpath("/html/body/form/div[10]/div[1]" +
+                        "/div/div[2]/div[2]/div[3]/div[1]/div[2]/div[1]/div[1]/div/div/div/div/div[1]/app-root/div" +
+                        "/app-user-info/div/div[1]/div/div[2]/div/div")).getText();
+
+                t3.setText(position);
+                t4.setText(department);
+                driver.quit();
+            } catch (Exception e){
+                JOptionPane.showMessageDialog(null, "Пользователь не найден");
+            }
+
+
             for(Row row : sheet) {
                 if(t1.getText().toLowerCase(Locale.ROOT).equals(row.getCell(3).toString().toLowerCase(Locale.ROOT))){
                     row.getCell(4).setCellValue(t2.getText());
@@ -283,6 +316,7 @@ public class App extends Frame{
                     break;
                 }
             }
+
             FileOutputStream fileOutputStream = new FileOutputStream(path);
             xssfWorkbook.write(fileOutputStream);
             fileInputStream.close();
