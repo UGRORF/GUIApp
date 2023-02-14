@@ -33,11 +33,7 @@ class TableModel extends AbstractTableModel {
 
 
     public boolean isCellEditable(int row, int col) {
-        if (row < 1) {
-            return false;
-        } else {
-            return true;
-        }
+        return true;
     }
 
 

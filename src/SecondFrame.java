@@ -22,9 +22,7 @@ public class SecondFrame extends Frame {
     JTextField t1;
     JButton b1;
     JTable table1;
-    String path1, path2, path3;
     JPanel jPanel, jPanel1, contents;
-    GroupLayout layout;
     eHandler handler;
 
     public SecondFrame() throws IOException {
@@ -55,7 +53,6 @@ public class SecondFrame extends Frame {
         jPanel1.add(table1, BorderLayout.CENTER);
         contents.add(jPanel1, BorderLayout.CENTER);
         add(contents);
-
 
         b1.addActionListener(handler);
     }
@@ -89,6 +86,7 @@ public class SecondFrame extends Frame {
 
         private void read(String path){
             try (DirectoryStream<Path> files = Files.newDirectoryStream(Path.of(path))) {
+                String path1 = "";
                 for (Path file : files) {
                     path1 = file.toString();
                 }
@@ -109,7 +107,6 @@ public class SecondFrame extends Frame {
                                 data = addElement(dataOfFile);
                             }
                         }
-
                     }
                 }
                 csvReader.close();
@@ -127,24 +124,13 @@ public class SecondFrame extends Frame {
                 for (int j = 0; j < 4; j++) {
                     newArr[i][j] = data[i][j];
                 }
-
             }
             newArr[data.length][0] = str[0];
             newArr[data.length][1] = str[3];
             newArr[data.length][2] = str[2];
             newArr[data.length][3] = str[6];
 
-
             return newArr;
-        }
-
-        private boolean isAccepted(String[] s, String[] s1){
-            boolean f = true;
-            for (int i = 0; i < s.length; i++) {
-                if(!s1[i].equals(s[i]))
-                    return false;
-            }
-            return f;
         }
     }
 }

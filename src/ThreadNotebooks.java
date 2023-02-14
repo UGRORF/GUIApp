@@ -1,6 +1,5 @@
 package src;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -11,9 +10,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import javax.swing.text.DateFormatter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -22,7 +19,6 @@ public class ThreadNotebooks implements Runnable {
     ChromeOptions options;
     ChromeDriver driver;
     String name;
-    String position, place, fio;
 
     public ThreadNotebooks(String name) throws IOException {
         this.thrd = new Thread(this, name);

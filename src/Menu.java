@@ -41,6 +41,7 @@ public class Menu extends JMenuBar{
                 app.setVisible(true);
                 frame.dispose();
             }
+
             if(e.getSource() == window2){
                 SecondFrame app = null;
                 try {
@@ -49,7 +50,6 @@ public class Menu extends JMenuBar{
                     ex.printStackTrace();
                 }
                 app.setSize(600, 400);
-
                 app.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 app.setLocationRelativeTo(null);
                 app.setVisible(true);

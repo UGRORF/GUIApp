@@ -4,8 +4,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.By;
-import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.chrome.ChromeDriver;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -28,24 +27,18 @@ public class App extends Frame{
     private final String path1, path2;
     GroupLayout layout;
     eHandler handler;
-    EdgeOptions options;
-    EdgeDriver driver;
 
     public App(){
         super();
-
-
 
         //Меню
         menu = new Menu(this);
         this.setJMenuBar(menu);
 
         handler = new eHandler();
-
-
-        //Path to files
-        path1 = "";
-        path2 = "";
+        //Само окно
+        path1 = "\\\\Moscow\\itfs\\ОСИТИЮГ\\Ростов\\Выдача ПВТ и МТ\\Мобилиная техника\\Ноутбуки\\Выдача ноутбуков — копия.xlsx";
+        path2 = "\\\\Moscow\\itfs\\ОСИТИЮГ\\Ростов\\Выдача ПВТ и МТ\\Мобилиная техника\\Планшеты+телефоны\\Выдача IPad — копия.xlsx";
 
         radioButton1 = new JRadioButton("Ноутбук");
         radioButton1.doClick();
@@ -54,7 +47,6 @@ public class App extends Frame{
         buttonGroup = new ButtonGroup();
         buttonGroup.add(radioButton1);
         buttonGroup.add(radioButton2);
-
 
         l1 = new JLabel("Серийный номер");
         t1 = new JTextField(10);
@@ -76,14 +68,10 @@ public class App extends Frame{
         b2 = new JButton("Применить");
         b3 = new JButton("Отмена");
 
-
-
-        // Определение менеджера расположения
         layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
-        // Создание горизонтальной группы
         layout.setHorizontalGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(l1)
@@ -118,7 +106,6 @@ public class App extends Frame{
 
         layout.linkSize(SwingConstants.HORIZONTAL, b1);
 
-        // Создание вертикальной группы
         layout.setVerticalGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(l1)
@@ -162,7 +149,6 @@ public class App extends Frame{
         l7.hide();
 
         addListener();
-
     }
 
     private void addListener(){
@@ -237,7 +223,10 @@ public class App extends Frame{
             boolean f = false;
 
             for(Row row : sheet) {
-                f = t1.getText().toLowerCase(Locale.ROOT).equals(row.getCell(3).toString().toLowerCase(Locale.ROOT));
+                String[] search = t1.getText().toLowerCase(Locale.ROOT).split(" ");
+                String[] sn = row.getCell(3).toString().toLowerCase(Locale.ROOT).split(" ");
+                String[] fio = row.getCell(4).toString().toLowerCase(Locale.ROOT).split(" ");
+                f = isAccepted(search, sn);
                 if(f){
                     t2.setText(String.valueOf(row.getCell(4)));
                     t3.setText(String.valueOf(row.getCell(5)));
@@ -282,26 +271,27 @@ public class App extends Frame{
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileInputStream);
             Sheet sheet = xssfWorkbook.getSheetAt(0);
 
+
             try {
-                options = new EdgeOptions();
-                options.addArguments("headless");
-                driver = new EdgeDriver();
                 String str = t2.getText();
                 str = str.replaceAll(" ", "* ");
                 System.out.println(str);
+                ChromeDriver driver = ThreadHandbook.getDriver();
                 driver.get("http://alfa/search/Pages/view.aspx#/all?query=" + str);
                 driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
                 driver.findElement(By.className("command_user_name_text_hover")).click();
+                driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
                 String position = driver.findElement(By.xpath("/html/body/form/div[10]/div[1]/div/div[2]/div[2]/div[3]" +
                         "/div[1]/div[2]/div[1]/div[1]/div/div/div/div/div[1]/app-root/div/app-user-info/div" +
                         "/div[2]/div[2]/div/app-main-user-data/div/div[2]")).getText();
+                driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
                 String department = driver.findElement(By.xpath("/html/body/form/div[10]/div[1]" +
                         "/div/div[2]/div[2]/div[3]/div[1]/div[2]/div[1]/div[1]/div/div/div/div/div[1]/app-root/div" +
                         "/app-user-info/div/div[1]/div/div[2]/div/div")).getText();
+                driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
                 t3.setText(position);
                 t4.setText(department);
-                driver.quit();
             } catch (Exception e){
                 JOptionPane.showMessageDialog(null, "Пользователь не найден");
             }
